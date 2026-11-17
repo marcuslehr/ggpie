@@ -31,20 +31,15 @@ ggpie <- function(x,
         ypos = 1 - cumsum(prop) + prop/2,
         angle = 90 - (360 * ypos),
         angle = ifelse(ypos > 0.5, angle + 180, angle)
-      ) 
-    # rowwise() %>% 
-    # mutate(
-    #     label = ifelse(text_label=='identity', categories,
-    #                ifelse(text_label=='percent', prop*100,
-    #                   ifelse(text_label=='both', 
-    #                          paste0(categories, ' - ', round(prop*100,1), '%'),
-    #                          NA)))
-    #   )
+      ) %>% 
+    rowwise() %>% # requried bc ifelse tests return a scalar
+    mutate(
+      label = ifelse(text_label=='identity', categories,
+                 ifelse(text_label=='percent', prop*100,
+                    ifelse(text_label=='both', paste0(categories, ' - ', round(prop*100,1), '%'),
+                           NA)))
+      )
   
-  if(text_label=='identity') data = data %>% mutate(label = categories)
-  if(text_label=='percent') data = data %>% mutate(label = prop*100)
-  if(text_label=='both') data = data %>% mutate(label = paste0(categories, ' - ', round(prop*100,1), '%'))
-
   
     suppressWarnings(
       ggplot2::ggplot(data, ggplot2::aes(x='x', y=prop, fill=categories)) +
